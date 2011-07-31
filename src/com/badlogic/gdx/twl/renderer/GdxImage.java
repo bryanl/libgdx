@@ -34,7 +34,7 @@ import de.matthiasmann.twl.renderer.SupportsDrawRepeat;
  * @author Nathan Sweet
  * @author Matthias Mann
  */
-class GdxImage implements Image, SupportsDrawRepeat {
+public class GdxImage implements Image, SupportsDrawRepeat {
 	private final GdxRenderer renderer;
 	private final Sprite sprite;
 	private final Color tintColor;
@@ -43,7 +43,7 @@ class GdxImage implements Image, SupportsDrawRepeat {
 	private final boolean tile;
 
 	public GdxImage (GdxRenderer renderer, Texture texture, int srcX, int srcY, int srcWidth, int srcHeight, Color color,
-		boolean tile) {
+		boolean tile, float rotation) {
 		this.renderer = renderer;
 		width = Math.abs(srcWidth);
 		height = Math.abs(srcHeight);
@@ -51,6 +51,7 @@ class GdxImage implements Image, SupportsDrawRepeat {
 		this.tile = tile;
 		sprite = new Sprite(texture, srcX, srcY, srcWidth, srcHeight);
 		sprite.flip(false, true);
+		sprite.setRotation(rotation);
 	}
 
 	public GdxImage (GdxImage image, Color tintColor) {

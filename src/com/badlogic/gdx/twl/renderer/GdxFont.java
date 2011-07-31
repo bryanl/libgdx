@@ -43,13 +43,15 @@ import de.matthiasmann.twl.utils.StateExpression;
  * @author Nathan Sweet
  * @author Matthias Mann
  */
-class GdxFont implements Font {
+public class GdxFont implements Font {
 	static private final HAlignment[] gdxAlignment = HAlignment.values();
 
 	final GdxRenderer renderer;
 	final BitmapFont bitmapFont;
 	private final FontState[] fontStates;
 	private final float yOffset;
+	
+	private Boolean proportional = null;
 
 	public GdxFont (GdxRenderer renderer, BitmapFont bitmapFont, Map<String, String> params, Collection<FontParameter> condParams) {
 		this.bitmapFont = bitmapFont;
@@ -196,5 +198,23 @@ class GdxFont implements Font {
 
 		public void destroy () {
 		}
+	}
+
+	public boolean isProportional()
+	{
+		if (proportional == null)
+		{
+			try
+			{
+				int iBound = (int)bitmapFont.getBounds("i").width;
+				int mBound = (int)bitmapFont.getBounds("m").width;
+				proportional = iBound != 0 && mBound != 0 && iBound != mBound;
+			}
+			catch(Exception e)
+			{
+				proportional = false;
+			}
+		}
+		return proportional;
 	}
 }

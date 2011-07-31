@@ -42,8 +42,10 @@ import de.matthiasmann.twl.renderer.Font;
 import de.matthiasmann.twl.renderer.FontParameter;
 import de.matthiasmann.twl.renderer.LineRenderer;
 import de.matthiasmann.twl.renderer.MouseCursor;
+import de.matthiasmann.twl.renderer.OffscreenRenderer;
 import de.matthiasmann.twl.renderer.Renderer;
 import de.matthiasmann.twl.renderer.Texture;
+import de.matthiasmann.twl.utils.ClipStack;
 
 // BOZO - Add cursors.
 
@@ -61,10 +63,12 @@ public class GdxRenderer implements Renderer {
 	private boolean rendering;
 	private int width, height;
 	final SpriteBatch batch;
+	
+	private final ClipStack clipStack;
 
 	public GdxRenderer (SpriteBatch batch) {
 		this.batch = batch;
-
+		clipStack = new ClipStack();
 		Widget root = new Widget() {
 			protected void layout () {
 				layoutChildrenFullInnerArea();
@@ -221,5 +225,40 @@ public class GdxRenderer implements Renderer {
 			next.a = this.a * a;
 			return next;
 		}
+	}
+
+	@Override
+	public void clipEnter(Rect rect)
+	{
+		clipStack.push(rect);
+		// using null might not be correct here.
+		setClipRect(null);
+	}
+
+	@Override
+	public void clipEnter(int x, int y, int w, int h)
+	{
+		clipStack.push(x, y, w, h);
+		setClipRect(null);
+	}
+	
+	@Override
+	public void clipLeave()
+	{
+		clipStack.pop();
+		setClipRect(null);
+	}
+
+	@Override
+	public boolean clipIsEmpty()
+	{
+		return clipStack.isClipEmpty();
+	}
+	
+	@Override
+	public OffscreenRenderer getOffscreenRenderer()
+	{
+		// this is the same as in LWJGLRenderer in the main TWL project
+		return null;
 	}
 }
