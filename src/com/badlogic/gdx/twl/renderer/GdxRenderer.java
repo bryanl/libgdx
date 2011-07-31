@@ -24,14 +24,17 @@ package com.badlogic.gdx.twl.renderer;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.FloatBuffer;
 import java.util.Collection;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.BufferUtils;
 
 import de.matthiasmann.twl.GUI;
 import de.matthiasmann.twl.Rect;
@@ -52,8 +55,9 @@ import de.matthiasmann.twl.utils.ClipStack;
 /**
  * @author Nathan Sweet
  * @author Matthias Mann
+ * @author Kurtis Kopf
  */
-public class GdxRenderer implements Renderer {
+public class GdxRenderer implements Renderer, LineRenderer {
 	private int mouseX, mouseY;
 	private GdxCacheContext cacheContext;
 	private boolean hasScissor;
@@ -160,17 +164,22 @@ public class GdxRenderer implements Renderer {
 	}
 
 	public LineRenderer getLineRenderer () {
-		return null; // Unsupported.
+		return this;
 	}
 
 	public DynamicImage createDynamicImage (int width, int height) {
+		//System.out.println("trying to allocate a dynamic image!");
 		return null; // Unsupported.
 	}
 
 	public void setCursor (MouseCursor cursor) {
+		// Unsupported
+		//System.out.println("trying to set cursor!");
 	}
 
 	public void setMouseButton (int arg0, boolean arg1) {
+		// Unsupported
+		//System.out.println("trying to set mouse button!");
 	}
 
 	public void setMousePosition (int mouseX, int mouseY) {
@@ -260,5 +269,36 @@ public class GdxRenderer implements Renderer {
 	{
 		// this is the same as in LWJGLRenderer in the main TWL project
 		return null;
+	}
+
+	@Override
+	public void drawLine(float[] pts, int numPts, float width, de.matthiasmann.twl.Color color, boolean drawAsLoop)
+	{
+		if(numPts*2 > pts.length) 
+		{
+            throw new ArrayIndexOutOfBoundsException(numPts*2);
+        }
+		if(numPts >= 2) 
+		{
+            if (Gdx.gl instanceof GL11 && Gdx.gl11 != null) // will catch above 1.1 as well
+            {
+            	tintStack.push(color.getRedFloat(), color.getGreenFloat(), color.getBlueFloat(), color.getAlphaFloat());
+            	Gdx.gl.glDisable(GL10.GL_TEXTURE_2D);
+                Gdx.gl.glLineWidth(width);
+            	FloatBuffer fb = BufferUtils.newFloatBuffer(pts.length);
+            	fb.put(pts);
+            	fb.position(0);
+            	// 2 = 2 floats per vertex
+            	// type = float buffer
+            	// stride = 0 : tightly packed buffer
+            	Gdx.gl11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+            	Gdx.gl11.glVertexPointer(2, GL10.GL_FLOAT, 0, fb);
+            	int mode = drawAsLoop ? GL11.GL_LINE_LOOP : GL11.GL_LINE_STRIP;
+            	//Gdx.gl11.glDrawElements(mode, numPts, GL10.GL_FLOAT, fb);
+            	Gdx.gl11.glDrawArrays(mode, 0, numPts);
+            	Gdx.gl11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
+            	Gdx.gl.glEnable(GL10.GL_TEXTURE_2D);
+            }
+        }
 	}
 }

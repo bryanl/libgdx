@@ -71,7 +71,8 @@ public class GdxTexture implements Texture, Resource {
 
 	public MouseCursor createCursor (int x, int y, int width, int height, int hotSpotX, int hotSpotY, Image imageRef) 
 	{
-		return null;
+		//System.out.println("trying to build a cursor!");
+		return null; // Unsupported.
 	}
 
 	public void themeLoadingDone () {
