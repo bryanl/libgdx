@@ -168,18 +168,15 @@ public class GdxRenderer implements Renderer, LineRenderer {
 	}
 
 	public DynamicImage createDynamicImage (int width, int height) {
-		//System.out.println("trying to allocate a dynamic image!");
 		return null; // Unsupported.
 	}
 
 	public void setCursor (MouseCursor cursor) {
 		// Unsupported
-		//System.out.println("trying to set cursor!");
 	}
 
 	public void setMouseButton (int arg0, boolean arg1) {
 		// Unsupported
-		//System.out.println("trying to set mouse button!");
 	}
 
 	public void setMousePosition (int mouseX, int mouseY) {
@@ -280,22 +277,19 @@ public class GdxRenderer implements Renderer, LineRenderer {
         }
 		if(numPts >= 2) 
 		{
-            if (Gdx.gl instanceof GL11 && Gdx.gl11 != null) // will catch above 1.1 as well
+            if (Gdx.gl11 != null)
             {
-            	tintStack.push(color.getRedFloat(), color.getGreenFloat(), color.getBlueFloat(), color.getAlphaFloat());
+            	//tintStack.push(color.getRedFloat(), color.getGreenFloat(), color.getBlueFloat(), color.getAlphaFloat());
             	Gdx.gl.glDisable(GL10.GL_TEXTURE_2D);
                 Gdx.gl.glLineWidth(width);
             	FloatBuffer fb = BufferUtils.newFloatBuffer(pts.length);
             	fb.put(pts);
             	fb.position(0);
-            	// 2 = 2 floats per vertex
-            	// type = float buffer
-            	// stride = 0 : tightly packed buffer
             	Gdx.gl11.glEnableClientState(GL11.GL_VERTEX_ARRAY);
-            	Gdx.gl11.glVertexPointer(2, GL10.GL_FLOAT, 0, fb);
-            	int mode = drawAsLoop ? GL11.GL_LINE_LOOP : GL11.GL_LINE_STRIP;
-            	//Gdx.gl11.glDrawElements(mode, numPts, GL10.GL_FLOAT, fb);
-            	Gdx.gl11.glDrawArrays(mode, 0, numPts);
+            	Gdx.gl11.glVertexPointer(2, GL11.GL_FLOAT, 0, fb);
+            	Gdx.gl11.glColor4f(color.getRedFloat(), color.getGreenFloat(), color.getBlueFloat(), color.getAlphaFloat());
+            	Gdx.gl11.glDrawArrays((drawAsLoop ? GL11.GL_LINE_LOOP : GL11.GL_LINE_STRIP), 0, numPts);
+            	Gdx.gl11.glColor4f(tintStack.r, tintStack.g, tintStack.b, tintStack.a);
             	Gdx.gl11.glDisableClientState(GL11.GL_VERTEX_ARRAY);
             	Gdx.gl.glEnable(GL10.GL_TEXTURE_2D);
             }
