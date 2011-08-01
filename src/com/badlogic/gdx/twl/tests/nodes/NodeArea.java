@@ -54,12 +54,15 @@ public class NodeArea extends DesktopArea {
     private Pad newConnectionPad;
     private int newConnectionX;
     private int newConnectionY;
+    
+    private boolean doubleClick = true;
 
-    public NodeArea() {
+    public NodeArea(boolean doubleClick) {
+    	this.doubleClick = doubleClick;
         this.nodes = new ArrayList<Node>();
         this.connections = new ArrayList<Connection>();
         this.bezierPoints = new float[NUM_BEZIER_POINTS*2];
-        this.infoText = new Label("Double click to create new nodes, then drag pads onto other pads to make connections");
+        this.infoText = new Label((doubleClick ? "Double click" : "Click") + " to create new nodes, then drag pads onto other pads to make connections");
 
         add(infoText);
     }
@@ -114,7 +117,7 @@ public class NodeArea extends DesktopArea {
         }
 
         if(evt.getType() == Event.Type.MOUSE_CLICKED) {
-            if(evt.getMouseClickCount() == 2) {
+            if(!doubleClick || evt.getMouseClickCount() == 2) {
                 Random r = new Random();
                 Node node = addNode("Node " + (1+r.nextInt(100)));
                 for(int i=0,n=r.nextInt(3) ; i<=n ; i++) {

@@ -42,7 +42,7 @@ public class Pad extends Widget {
     public static final StateKey STATE_HOVER            = StateKey.get("hover");
     public static final StateKey STATE_DRAG_DESTINATION = StateKey.get("dragDestination");
     
-    public static final int RADIUS = 5;
+    public static int RADIUS = 5;
 
     private final Node node;
     private final boolean input;

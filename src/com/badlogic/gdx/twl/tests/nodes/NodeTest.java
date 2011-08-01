@@ -1,13 +1,17 @@
 package com.badlogic.gdx.twl.tests.nodes;
 
+import java.nio.FloatBuffer;
+
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.graphics.GL10;
+import com.badlogic.gdx.graphics.GL11;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.twl.TWL;
+import com.badlogic.gdx.utils.BufferUtils;
 
 import de.matthiasmann.twl.ScrollPane;
 
@@ -16,10 +20,23 @@ public class NodeTest implements ApplicationListener, InputProcessor
 	private TWL twl;
 	private InputMultiplexer input = new InputMultiplexer();
 	
+	private NodeArea nodeArea;
+	private Node nodeSource;
+	private Node nodeSink;
+	
+	private boolean doubleClick = true;
+	
+	public NodeTest(boolean doubleClick, int radius)
+	{
+		super();
+		this.doubleClick = doubleClick;
+		Pad.RADIUS = radius;
+	}
+	
 	@Override
 	public void create()
 	{
-		NodeArea nodeArea = new NodeArea();
+		nodeArea = new NodeArea(doubleClick);
         ScrollPane scrollPane = new ScrollPane(nodeArea);
         scrollPane.setExpandContentSize(true);
 		
@@ -29,15 +46,12 @@ public class NodeTest implements ApplicationListener, InputProcessor
 		input.addProcessor(this);
 		Gdx.input.setInputProcessor(twl);
 		
-		Node nodeSource = nodeArea.addNode("Source");
-        nodeSource.setPosition(50, 50);
-        Pad nodeSourceColor = nodeSource.addPad("Color", false);
+		nodeSource = nodeArea.addNode("Source");
+		Pad nodeSourceColor = nodeSource.addPad("Output 1", false);
         Pad nodeSourceAlpha = nodeSource.addPad("Alpha", false);
-
-        Node nodeSink = nodeArea.addNode("Sink");
-        nodeSink.setPosition(350, 200);
-        Pad nodeSinkColor = nodeSink.addPad("Color", true);
-
+        
+        nodeSink = nodeArea.addNode("Sink");
+        Pad nodeSinkColor = nodeSink.addPad("Input 1", true);
         nodeArea.addConnection(nodeSourceColor, nodeSinkColor);
 	}
 	@Override
@@ -53,6 +67,11 @@ public class NodeTest implements ApplicationListener, InputProcessor
 	@Override
 	public void resize(int width, int height)
 	{
+        nodeSource.setPosition((int)(width * 0.2f), (int)(height * 0.3f));
+        nodeSource.adjustSize();
+
+        nodeSink.setPosition((int)(width * 0.75f), (int)(height * 0.6f));
+        nodeSink.adjustSize();
 	}
 	@Override
 	public void pause()
